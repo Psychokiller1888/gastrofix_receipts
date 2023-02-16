@@ -1,0 +1,347 @@
+<html>
+<head>
+    <script type="text/javascript">
+        const MAXWIDTH = 42
+
+        const VARS = {
+            'header-graphic': 'MY LOGO',
+            restaurantname: 'Hôtel Restaurant Cave Bel-Air',
+            restaurantaddress: 'Route Principale 145, 1788 Praz-Vully',
+            telephone: '+41 (0)26 673 14 14',
+            taxnumber: 'CHE-417.595.526 TVA',
+            billkindinfo: 'Ce n\'est pas une facture',
+            table: 999,
+            waitername: 'Laurent Chervet',
+            date: new Date(),
+            billno: Math.floor(Math.random() * 1000),
+            discountName: 'Rabais test',
+            total: '18 CHF',
+            tableDiscount: '-10 CHF',
+            tableTip: '2 CHF',
+            totalwithtip: '10 CHF'
+        }
+
+        const HEADER = `
+            <row>
+                <column>
+                    <image>{{ header-graphic }}</image>
+                </column>
+            </row>
+            <drawer />
+            <logo70 />
+            <row>
+                <column width="42" align="center">
+                    {{ restaurantname }}
+                </column>
+            </row>
+            <row>
+                <column width="42" align="center">
+                    {{ restaurantaddress }}
+                </column>
+            </row>
+            <row>
+                <column width="42" align="center">
+                    {{ telephone }}
+                </column>
+            </row>
+            <row>
+                <column width="42" align="center">
+                    {{ taxnumber }}
+                </column>
+            </row>
+            <row>
+                <column width="42"></column>
+            </row>
+            <row>
+                <column width="41" style="emphasized">Décompte</column>
+            </row>
+            <row>
+                <column width="41">{{ billkindinfo }}</column>
+            </row>
+            <row>
+                <column width="42"></column>
+            </row>
+            <row>
+                <column width="15">
+                    Table:
+                </column>
+                <column width="26">
+                    {{ table }}
+                </column>
+            </row>
+            <row>
+                <column width="15">
+                    Service:
+                </column>
+                <column width="26">
+                    {{ waitername }}
+                </column>
+            </row>
+        `
+
+        const BODY = `
+            <row>
+                <column width="15">
+                    Date / heure:
+                </column>
+                <column width="25">
+                    {{ date }} / {{ time }}
+                </column>
+            </row>
+            <row>
+                <column width="15">
+                    Fact. no:
+                </column>
+                <column width="25">
+                    {{ billno }}
+                </column>
+            </row>
+            <row>
+                <column width="41" style="double-height">
+                    {{ coursegroup }}
+                </column>
+            </row>
+            <row>
+                <column width="41" fill-with="~" align="center"></column>
+            </row>
+            {{#positions}}
+            <row>
+                <column align="right" width="4">
+                    {{ count }}x
+                </column>
+                <column width="18">
+                    {{ text }}
+                </column>
+                <column align="right" width="8">
+                    {{ priceNoCurrency }}
+                </column>
+                <column align="right" width="8">
+                    {{ positionPriceNoCurrency }}
+                </column>
+            </row>
+            {{#constraints}}
+            <row>
+                <column width="3"></column>
+                <column align="left" width="29">
+                    {{ constraintcount }}x {{ constrainttext }}
+                </column>
+                <column align="right" width="8">
+                    {{ constraintprice_no_currency }}
+                </column>
+            </row>
+            {{/constraints}}
+            {{/positions}}
+            <row>
+                <column width="12" style="double-height">
+                    Sous total:
+                </column>
+                <column style="double-height" align="right" width="28">
+                    {{ total }}
+                </column>
+            </row>
+            <row>
+                <column width="30" style="double-height">
+                    {{ discountName }}
+                </column>
+                <column style="double-height" align="right" width="10">
+                    {{ tableDiscount }}
+                </column>
+            </row>
+            <row>
+                <column width="41" fill-with="$"></column>
+            </row>
+            <row>
+                <column width="12" style="double-height">
+                    Pourboire:
+                </column>
+                <column width="28" style="double-height" align="right">
+                    {{tableTip}}
+                </column>
+            </row>
+            <row>
+                <column width="12"  style="bold">
+                    Total:
+                </column>
+                <column width="28"  style="bold" align="right">
+                    {{totalwithtip}}
+                </column>
+            </row>
+            <row>
+                <column width="41" fill-with="$"></column>
+            </row>
+            <row>
+                <column width="42" style="double-height"></column>
+            </row>
+            {{#vats}}
+            <row>
+                <column width="22">
+                    {{ name }}:
+                </column>
+                <column width="18" align="right">
+                    {{ value }}
+                </column>
+            </row>
+            <row>
+                <column width="22">
+                    Montant hors TVA:
+                </column>
+                <column width="18" align="right">
+                    {{ netprice }}
+                </column>
+            </row>
+            {{/vats}}
+        `
+
+        const FOOTER = `
+            <row>
+                <column width="42" style="double-height"></column>
+            </row>
+            <row>
+                <column width="41" fill-with="~"></column>
+            </row>
+            <row>
+                <column width="42" style="double-height"></column>
+            </row>
+            <row>
+                <column width="42" style="double-height" align="center">Paiement par facture</column>
+            </row>
+            <row>
+                <column width="42" fill-with="." style="double-height">Email: </column>
+            </row>
+            <row>
+                <column width="42" fill-with="." style="double-height">Téléphone: </column>
+            </row>
+            <row>
+                <column width="42" fill-with="." style="double-height">Nom: </column>
+            </row>
+            <row>
+                <column width="42" fill-with="." style="double-height">Prénom: </column>
+            </row>
+            <row>
+                <column width="42" fill-with="." style="double-height">Adresse: </column>
+            </row>
+            <row>
+                <column width="42" fill-with="." style="double-height">NPA: </column>
+            </row>
+            <row>
+                <column width="42" fill-with="." style="double-height">Ville: </column>
+            </row>
+            <row>
+                <column width="42"></column>
+            </row>
+            <row>
+                <column width="42" fill-with="^"></column>
+            </row>
+            <row>
+                <column width="42"></column>
+            </row>
+            <row>
+                <column width="42" style="double-height" align="center">Paiement sur chambre d'hôtel</column>
+            </row>
+            <row>
+                <column width="42" fill-with="." style="double-height">Numéro de chambre: </column>
+            </row>
+            <row>
+                <column width="42"></column>
+            </row>
+            <row>
+                <column width="42" fill-with="." style="double-height">Signature: </column>
+            </row>
+            <row>
+                <column width="42"></column>
+            </row>
+            <row>
+                <column width="42" fill-with="*"></column>
+            </row>
+        `
+
+    </script>
+    <style>
+        :root {
+            --max-char: 42ch;
+        }
+        .ticket {
+            width: var(--max-char);
+            max-width: var(--max-char);
+            background-color: antiquewhite;
+            border: 1px solid black;
+            font-family: monospace;
+            font-weight: normal;
+            font-size: 1em;
+            overflow: hidden;
+        }
+        row {
+            display: block;
+            width: var(--max-char);
+            max-width: var(--max-char);
+        }
+        column {
+            display: inline-block;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            width: var(--max-char);
+            min-width: 1ch;
+            max-width: var(--max-char);
+            border: 0 solid black;
+            white-space: nowrap;
+            height: 1.25em;
+        }
+        image {
+            width: var(--max-char);
+            max-width: var(--max-char);
+            align-content: center;
+        }
+        column[styling*="emphasized"] {
+            font-weight: bold;
+        }
+        column[styling*="double-height"] {
+            font-weight: bold;
+            height: 2.5em;
+        }
+        column[align="center"] {
+            text-align: center;
+        }
+        column[align="left"] {
+            text-align: left;
+        }
+        column[align="right"] {
+            text-align: right;
+        }
+    </style>
+</head>
+<body>
+<div class="ticket">
+    {{HEADER}}
+    {{BODY}}
+    {{FOOTER}}
+</div>
+
+<script type="text/javascript">
+    document.body.innerHTML = document.body.innerHTML.replace(/{{HEADER}}/g, HEADER)
+    document.body.innerHTML = document.body.innerHTML.replace(/{{BODY}}/g, BODY)
+    document.body.innerHTML = document.body.innerHTML.replace(/{{FOOTER}}/g, FOOTER)
+    document.body.innerHTML = document.body.innerHTML.replace(/style/g, 'styling')
+
+    for (const [key, value] of Object.entries(VARS)) {
+        let regex = `{{[ ]*${key}[ ]*}}`
+        let re = new RegExp(regex, 'g')
+        document.body.innerHTML = document.body.innerHTML.replace(re, value)
+    }
+
+    document.body.innerHTML = document.body.innerHTML.replace(/style/g, 'styling')
+    const fillers = document.querySelectorAll("[fill-with]")
+    for (const filler of fillers) {
+        const char = filler.attributes['fill-with'].textContent
+        const count = MAXWIDTH - filler.innerHTML.length
+        filler.innerHTML = `${filler.innerHTML}${char.repeat(count)}`
+    }
+    const widths = document.querySelectorAll("[width]")
+    for (const el of widths) {
+        const width = el.attributes['width'].textContent
+        el.style.width = `${width}ch`
+    }
+</script>
+
+</body>
+<html>
